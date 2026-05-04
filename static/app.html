@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Guard Pay — Secure Nigerian Payments</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --green:    #00c853;
+    --green-d:  #00a040;
+    --green-l:  #e6fff0;
+    --dark:     #0a0f0d;
+    --card:     #111916;
+    --border:   #1e2e24;
+    --muted:    #4a6355;
+    --text:     #e8f5ee;
+    --text2:    #8aaa96;
+    --red:      #ff4444;
+    --orange:   #ff9500;
+    --yellow:   #ffd60a;
+    --radius:   16px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--dark);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  h1,h2,h3,h4 { font-family: 'Syne', sans-serif; }
+
+  /* ── Auth Screen ── */
+  #auth-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse at 20% 50%, #003322 0%, var(--dark) 60%);
+    padding: 24px;
+  }
+  .auth-box {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    padding: 40px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 40px 80px rgba(0,200,83,0.08);
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 32px;
+  }
+  .logo-icon {
+    width: 44px; height: 44px;
+    background: var(--green);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+  }
+  .logo h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+  .logo span { color: var(--green); }
+  .auth-tabs {
+    display: flex;
+    background: #0d1610;
+    border-radius: 12px;
+    padding: 4px;
+    margin-bottom: 28px;
+  }
+  .auth-tab {
+    flex: 1; padding: 10px;
+    border: none; background: transparent;
+    color: var(--text2); font-family: 'Syne', sans-serif;
+    font-size: 14px; font-weight: 600;
+    border-radius: 10px; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .auth-tab.active { background: var(--green); color: var(--dark); }
+  .form-group { margin-bottom: 16px; }
+  .form-group label {
+    display: block; font-size: 12px; font-weight: 500;
+    color: var(--text2); margin-bottom: 6px; text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .form-group input, .form-group select {
+    width: 100%; padding: 14px 16px;
+    background: #0d1610; border: 1px solid var(--border);
+    border-radius: 12px; color: var(--text);
+    font-family: 'DM Sans', sans-serif; font-size: 15px;
+    outline: none; transition: border-color 0.2s;
+  }
+  .form-group input:focus, .form-group select:focus {
+    border-color: var(--green);
+  }
+  .form-group select option { background: #0d1610; }
+  .btn-primary {
+    width: 100%; padding: 16px;
+    background: var(--green); color: var(--dark);
+    border: none; border-radius: 12px;
+    font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700;
+    cursor: pointer; transition: all 0.2s; margin-top: 8px;
+  }
+  .btn-primary:hover { background: var(--green-d); transform: translateY(-1px); }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  .auth-error {
+    background: rgba(255,68,68,0.1); border: 1px solid rgba(255,68,68,0.3);
+    color: var(--red); padding: 12px 16px; border-radius: 10px;
+    font-size: 13px; margin-top: 12px; display: none;
+  }
+
+  /* ── App Shell ── */
+  #app-screen { display: none; min-height: 100vh; }
+  .app-header {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .header-logo { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; }
+  .header-logo span { color: var(--green); }
+  .header-right { display: flex; align-items: center; gap: 16px; }
+  .user-pill {
+    background: #0d1610; border: 1px solid var(--border);
+    border-radius: 100px; padding: 8px 16px;
+    font-size: 13px; font-weight: 500;
+  }
+  .btn-logout {
+    background: transparent; border: 1px solid var(--border);
+    color: var(--text2); padding: 8px 16px; border-radius: 100px;
+    font-size: 13px; cursor: pointer; transition: all 0.2s;
+  }
+  .btn-logout:hover { border-color: var(--red); color: var(--red); }
+
+  /* ── Nav ── */
+  .app-nav {
+    background: var(--card); border-bottom: 1px solid var(--border);
+    padding: 0 24px; display: flex; gap: 4px;
+  }
+  .nav-btn {
+    padding: 14px 20px; border: none; background: transparent;
+    color: var(--text2); font-family: 'Syne', sans-serif;
+    font-size: 13px; font-weight: 600; cursor: pointer;
+    border-bottom: 2px solid transparent; transition: all 0.2s;
+  }
+  .nav-btn.active { color: var(--green); border-bottom-color: var(--green); }
+  .nav-btn:hover { color: var(--text); }
+
+  /* ── Content ── */
+  .app-content { padding: 32px 24px; max-width: 1100px; margin: 0 auto; }
+
+  /* ── Dashboard ── */
+  .balance-card {
+    background: linear-gradient(135deg, #003d1f 0%, #001a0d 100%);
+    border: 1px solid #005c2e;
+    border-radius: var(--radius); padding: 32px;
+    margin-bottom: 24px; position: relative; overflow: hidden;
+  }
+  .balance-card::before {
+    content: '';
+    position: absolute; top: -40px; right: -40px;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(0,200,83,0.15) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .balance-label { font-size: 12px; color: #5a9970; text-transform: uppercase;
+    letter-spacing: 1px; margin-bottom: 8px; }
+  .balance-amount { font-family: 'Syne', sans-serif; font-size: 42px; font-weight: 800;
+    letter-spacing: -1px; color: var(--text); }
+  .balance-account { font-size: 13px; color: var(--muted); margin-top: 8px; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+  .stat-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px;
+  }
+  .stat-label { font-size: 11px; color: var(--text2); text-transform: uppercase;
+    letter-spacing: 0.5px; margin-bottom: 6px; }
+  .stat-value { font-family: 'Syne', sans-serif; font-size: 24px; font-weight: 700; }
+
+  /* ── Transfer ── */
+  .transfer-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 28px; max-width: 500px;
+  }
+  .transfer-card h3 { margin-bottom: 24px; font-size: 18px; }
+  .beneficiary-preview {
+    background: var(--green-l); border: 1px solid rgba(0,200,83,0.3);
+    border-radius: 10px; padding: 12px 16px; margin-bottom: 16px;
+    font-size: 13px; color: #004d22; display: none;
+  }
+  .risk-result {
+    margin-top: 20px; border-radius: 12px; padding: 20px; display: none;
+  }
+  .risk-result.LOW      { background: rgba(0,200,83,0.1);  border: 1px solid rgba(0,200,83,0.3); }
+  .risk-result.MEDIUM   { background: rgba(255,213,10,0.1); border: 1px solid rgba(255,213,10,0.3); }
+  .risk-result.HIGH     { background: rgba(255,149,0,0.1);  border: 1px solid rgba(255,149,0,0.3); }
+  .risk-result.CRITICAL { background: rgba(255,68,68,0.1);  border: 1px solid rgba(255,68,68,0.3); }
+  .risk-band-badge {
+    display: inline-block; padding: 4px 12px; border-radius: 100px;
+    font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .badge-LOW      { background: var(--green);  color: var(--dark); }
+  .badge-MEDIUM   { background: var(--yellow); color: var(--dark); }
+  .badge-HIGH     { background: var(--orange); color: var(--dark); }
+  .badge-CRITICAL { background: var(--red);    color: white; }
+
+  /* ── Transactions ── */
+  .txn-list { display: flex; flex-direction: column; gap: 10px; }
+  .txn-item {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 16px 20px;
+    display: flex; align-items: center; justify-content: space-between;
+    transition: border-color 0.2s;
+  }
+  .txn-item:hover { border-color: var(--green); }
+  .txn-left { display: flex; align-items: center; gap: 14px; }
+  .txn-icon {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+  .txn-icon.debit  { background: rgba(255,68,68,0.15); }
+  .txn-icon.credit { background: rgba(0,200,83,0.15); }
+  .txn-name { font-weight: 500; font-size: 14px; }
+  .txn-date { font-size: 12px; color: var(--text2); margin-top: 2px; }
+  .txn-right { text-align: right; }
+  .txn-amount { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 15px; }
+  .txn-amount.debit  { color: var(--red); }
+  .txn-amount.credit { color: var(--green); }
+  .txn-status { font-size: 11px; margin-top: 2px; }
+  .risk-dot {
+    display: inline-block; width: 7px; height: 7px;
+    border-radius: 50%; margin-right: 4px;
+  }
+  .dot-LOW      { background: var(--green); }
+  .dot-MEDIUM   { background: var(--yellow); }
+  .dot-HIGH     { background: var(--orange); }
+  .dot-CRITICAL { background: var(--red); }
+
+  /* ── Admin ── */
+  .admin-stats {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px; margin-bottom: 28px;
+  }
+  .admin-stat {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 20px;
+  }
+  .admin-stat-label { font-size: 11px; color: var(--text2);
+    text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .admin-stat-value { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 700; }
+
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th {
+    text-align: left; padding: 12px 16px;
+    background: #0d1610; color: var(--text2);
+    font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border);
+  }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+  tbody tr:hover { background: #0d1610; }
+  tbody td { padding: 12px 16px; color: var(--text); vertical-align: middle; }
+  .score-bar {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .score-track {
+    flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden;
+  }
+  .score-fill { height: 100%; border-radius: 3px; }
+
+  /* ── Queue ── */
+  .queue-item {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 24px; margin-bottom: 16px;
+  }
+  .queue-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+  .queue-actions { display: flex; gap: 10px; margin-top: 16px; }
+  .btn-approve {
+    padding: 10px 20px; background: var(--green); color: var(--dark);
+    border: none; border-radius: 8px; font-weight: 700;
+    font-family: 'Syne', sans-serif; cursor: pointer; font-size: 13px;
+  }
+  .btn-reject {
+    padding: 10px 20px; background: transparent; color: var(--red);
+    border: 1px solid var(--red); border-radius: 8px; font-weight: 700;
+    font-family: 'Syne', sans-serif; cursor: pointer; font-size: 13px;
+  }
+  .signal-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .signal-tag {
+    background: rgba(255,149,0,0.15); color: var(--orange);
+    padding: 3px 10px; border-radius: 100px; font-size: 11px; font-weight: 500;
+  }
+
+  /* ── Misc ── */
+  .section-title {
+    font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700;
+    margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;
+  }
+  .empty-state {
+    text-align: center; padding: 48px; color: var(--text2); font-size: 14px;
+  }
+  .loading { text-align: center; padding: 32px; color: var(--text2); }
+  .toast {
+    position: fixed; bottom: 24px; right: 24px;
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 16px 20px; font-size: 14px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    transform: translateY(100px); opacity: 0;
+    transition: all 0.3s; z-index: 1000; max-width: 320px;
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+</style>
+</head>
+<body>
+
+<!-- ── Auth Screen ── -->
+<div id="auth-screen">
+  <div class="auth-box">
+    <div class="logo">
+      <div class="logo-icon">🛡️</div>
+      <h1>Guard<span>Pay</span></h1>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchAuth('login')">Login</button>
+      <button class="auth-tab" onclick="switchAuth('register')">Register</button>
+    </div>
+
+    <!-- Login -->
+    <div id="login-form">
+      <div class="form-group">
+        <label>Phone Number</label>
+        <input type="tel" id="login-phone" placeholder="08012345678"/>
+      </div>
+      <div class="form-group">
+        <label>4-Digit PIN</label>
+        <input type="password" id="login-pin" maxlength="4" placeholder="••••"/>
+      </div>
+      <button class="btn-primary" onclick="doLogin()">Login to Guard Pay</button>
+      <div class="auth-error" id="login-error"></div>
+    </div>
+
+    <!-- Register -->
+    <div id="register-form" style="display:none">
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="reg-name" placeholder="Emeka Okafor"/>
+      </div>
+      <div class="form-group">
+        <label>Phone Number</label>
+        <input type="tel" id="reg-phone" placeholder="08012345678"/>
+      </div>
+      <div class="form-group">
+        <label>State</label>
+        <select id="reg-state">
+          <option>Lagos</option><option>Abuja</option><option>Kano</option>
+          <option>Rivers</option><option>Oyo</option><option>Kaduna</option>
+          <option>Anambra</option><option>Delta</option><option>Enugu</option>
+          <option>Ogun</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Create 4-Digit PIN</label>
+        <input type="password" id="reg-pin" maxlength="4" placeholder="••••"/>
+      </div>
+      <button class="btn-primary" onclick="doRegister()">Create Account</button>
+      <div class="auth-error" id="reg-error"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── App Screen ── -->
+<div id="app-screen">
+  <header class="app-header">
+    <div class="header-logo">Guard<span>Pay</span></div>
+    <div class="header-right">
+      <div class="user-pill" id="header-user">—</div>
+      <button class="btn-logout" onclick="logout()">Logout</button>
+    </div>
+  </header>
+
+  <nav class="app-nav">
+    <button class="nav-btn active" onclick="showTab('dashboard')">Dashboard</button>
+    <button class="nav-btn" onclick="showTab('transfer')">Send Money</button>
+    <button class="nav-btn" onclick="showTab('history')">History</button>
+    <button class="nav-btn" onclick="showTab('profile')">Edit Profile</button>
+    <button class="nav-btn admin-only" onclick="showTab('admin')" style="display:none">Admin</button>
+    <button class="nav-btn admin-only" onclick="showTab('queue')" style="display:none">
+      Compliance Queue <span id="queue-badge" style="background:var(--red);color:white;padding:2px 7px;border-radius:100px;font-size:11px;margin-left:4px;display:none"></span>
+    </button>
+  </nav>
+
+    <!-- Dashboard -->
+    <div id="tab-dashboard" class="tab-content active">
+      <div class="balance-card">
+        <div class="balance-label">Available Balance</div>
+        <div class="balance-amount" id="dash-balance">₦0.00</div>
+        <div class="balance-account" id="dash-account">Account: —</div>
+      </div>
+      <div class="grid-2">
+        <div class="stat-card">
+          <div class="stat-label">Total Sent</div>
+          <div class="stat-value" id="dash-sent">₦0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Transactions</div>
+          <div class="stat-value" id="dash-count">0</div>
+        </div>
+      </div>
+      <div class="section-title">Recent Activity</div>
+      <div id="dash-recent" class="txn-list">
+        <div class="loading">Loading transactions...</div>
+      </div>
+    </div>
+
+    <!-- Transfer -->
+    <div id="tab-transfer" class="tab-content">
+      <div class="transfer-card">
+        <h3>Send Money</h3>
+        <div class="form-group">
+          <label>Beneficiary Account Number</label>
+          <input type="text" id="t-bene-account" maxlength="10" placeholder="0123456789"
+                 oninput="lookupBene()"/>
+        </div>
+        <div class="beneficiary-preview" id="bene-preview"></div>
+        <div class="form-group">
+          <label>Amount (₦)</label>
+          <input type="number" id="t-amount" placeholder="5000" min="1"/>
+        </div>
+        <div class="form-group">
+          <label>Narration</label>
+          <input type="text" id="t-narration" placeholder="School fees, rent, etc."/>
+        </div>
+        <div class="form-group">
+          <label>Channel</label>
+          <select id="t-channel">
+            <option value="mobile_app">Mobile App</option>
+            <option value="USSD">USSD</option>
+            <option value="web">Web</option>
+            <option value="POS">POS</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Your PIN</label>
+          <input type="password" id="t-pin" maxlength="4" placeholder="••••"/>
+        </div>
+        <button class="btn-primary" onclick="doTransfer()">Send Money</button>
+
+        <div class="risk-result" id="risk-result">
+          <div id="risk-badge"></div>
+          <div id="risk-score-text" style="font-size:13px;margin-bottom:6px;"></div>
+          <div id="risk-message" style="font-size:13px;"></div>
+          <div id="risk-signals" class="signal-tags" style="margin-top:10px;"></div>
+          <div id="risk-ndpa" style="font-size:11px;color:var(--text2);margin-top:10px;font-style:italic;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- History -->
+    <div id="tab-history" class="tab-content">
+      <div class="section-title">Transaction History</div>
+      <div id="history-list" class="txn-list">
+        <div class="loading">Loading...</div>
+      </div>
+    </div>
+
+    <!-- Change Name / State / Phone -->
+  <div id="tab-profile" class="tab-content">
+      <div class="transfer-card">
+        <h3>Edit Profile</h3>
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="edit-name" placeholder="Leave blank to keep current"/>
+        </div>
+        <div class="form-group">
+          <label>Phone Number</label>
+          <input type="tel" id="edit-phone" placeholder="Leave blank to keep current"/>
+        </div>
+        <div class="form-group">
+          <label>State</label>
+          <select id="edit-state">
+            <option>Lagos</option><option>Abuja</option><option>Kano</option>
+            <option>Rivers</option><option>Oyo</option><option>Kaduna</option>
+            <option>Anambra</option><option>Delta</option><option>Enugu</option>
+            <option>Ogun</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Current PIN (required to save)</label>
+          <input type="password" id="edit-pin" maxlength="4" placeholder="••••"/>
+        </div>
+        <button class="btn-primary" onclick="saveProfile()">Save Changes</button>
+      </div>
+    </div>
+  
+    <!-- Admin -->
+    <div id="tab-admin" class="tab-content">
+      <div class="admin-stats" id="admin-stats-grid"></div>
+      <div class="section-title">All Transactions</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Ref</th><th>From</th><th>To</th>
+              <th>Amount</th><th>Risk Score</th><th>Band</th>
+              <th>Status</th><th>Time</th>
+            </tr>
+          </thead>
+          <tbody id="admin-txn-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Queue -->
+    <div id="tab-queue" class="tab-content">
+      <div class="section-title">Compliance Queue — Pending Human Review</div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:20px;">
+        These transactions are held under NDPA Section 37(1). Review each before approving or rejecting.
+      </p>
+      <div id="queue-list"></div>
+    </div>
+</div>
+
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = '';  // same origin
+let currentUser = null;
+
+// ── Auth ──────────────────────────────────────────────────────────────────────
+
+function switchAuth(mode) {
+  document.querySelectorAll('.auth-tab').forEach((t,i) =>
+    t.classList.toggle('active', (mode==='login'&&i===0)||(mode==='register'&&i===1)));
+  document.getElementById('login-form').style.display    = mode==='login'    ? '' : 'none';
+  document.getElementById('register-form').style.display = mode==='register' ? '' : 'none';
+}
+
+async function doLogin() {
+  const phone = document.getElementById('login-phone').value.trim();
+  const pin   = document.getElementById('login-pin').value.trim();
+  const err   = document.getElementById('login-error');
+  err.style.display = 'none';
+  if (!phone || !pin) { showErr(err, 'Please fill all fields.'); return; }
+
+  try {
+    const res  = await post('/api/login', { phone, pin });
+    currentUser = res;
+    showApp();
+  } catch(e) { showErr(err, e.message); }
+}
+
+async function doRegister() {
+  const full_name = document.getElementById('reg-name').value.trim();
+  const phone     = document.getElementById('reg-phone').value.trim();
+  const state     = document.getElementById('reg-state').value;
+  const pin       = document.getElementById('reg-pin').value.trim();
+  const err       = document.getElementById('reg-error');
+  err.style.display = 'none';
+  if (!full_name||!phone||!pin) { showErr(err,'Please fill all fields.'); return; }
+  if (pin.length !== 4)         { showErr(err,'PIN must be exactly 4 digits.'); return; }
+
+  try {
+    const res = await post('/api/register', { full_name, phone, state, pin });
+    toast(`✅ Account created! Your account number: ${res.account_number}. You received ₦50,000 bonus!`, 6000);
+    switchAuth('login');
+    document.getElementById('login-phone').value = phone;
+  } catch(e) { showErr(err, e.message); }
+}
+
+function showApp() {
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app-screen').style.display  = 'block';
+  document.getElementById('header-user').textContent   = currentUser.full_name;
+
+  if (currentUser.is_admin) {
+    document.querySelectorAll('.admin-only').forEach(el => el.style.display = '');
+  }
+
+  loadDashboard();
+}
+
+function logout() {
+  currentUser = null;
+  document.getElementById('auth-screen').style.display = '';
+  document.getElementById('app-screen').style.display  = 'none';
+  showTab('dashboard');
+}
+
+// ── Navigation ────────────────────────────────────────────────────────────────
+
+function showTab(name) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById(`tab-${name}`).classList.add('active');
+  event.target.classList.add('active');
+
+  if (name === 'dashboard') loadDashboard();
+  if (name === 'history')   loadHistory();
+  if (name === 'admin')     loadAdmin();
+  if (name === 'queue')     loadQueue();
+  if (name === 'profile')   loadProfile();
+}
+
+// ── Dashboard ─────────────────────────────────────────────────────────────────
+
+async function loadDashboard() {
+  if (!currentUser) return;
+
+  // Refresh balance
+  try {
+    const b = await get(`/api/balance/${currentUser.account_number}`);
+    currentUser.balance = b.balance;
+    document.getElementById('dash-balance').textContent = fmt(b.balance);
+  } catch(e) {}
+
+  document.getElementById('dash-account').innerHTML =
+    `Account: <span id="acc-num" style="font-family:monospace;letter-spacing:1px;cursor:pointer;
+    border-bottom:1px dashed var(--muted)" onclick="copyAccount()" title="Click to copy">
+    ${currentUser.account_number}</span>
+    <span id="copy-confirm" style="color:var(--green);font-size:11px;margin-left:8px;display:none">✓ Copied!</span>`;
+
+  const txns = await get(`/api/transactions/${currentUser.account_number}?limit=5`);
+  const sent = txns.filter(t => t.sender_account === currentUser.account_number && t.status === 'completed')
+                   .reduce((s, t) => s + t.amount, 0);
+
+  document.getElementById('dash-sent').textContent  = fmt(sent);
+  document.getElementById('dash-count').textContent = txns.length;
+
+  const el = document.getElementById('dash-recent');
+  if (!txns.length) { el.innerHTML = '<div class="empty-state">No transactions yet.</div>'; return; }
+  el.innerHTML = txns.slice(0,5).map(t => txnHtml(t)).join('');
+}
+
+// ── Transfer ──────────────────────────────────────────────────────────────────
+
+let beneTimer = null;
+function lookupBene() {
+  clearTimeout(beneTimer);
+  const acc = document.getElementById('t-bene-account').value.trim();
+  const prev = document.getElementById('bene-preview');
+  if (acc.length !== 10) { prev.style.display = 'none'; return; }
+  beneTimer = setTimeout(async () => {
+    try {
+      const res = await get(`/api/lookup/${acc}`);
+      prev.style.display = '';
+      prev.textContent   = `✓  ${res.full_name}`;
+    } catch { prev.style.display = 'none'; }
+  }, 500);
+}
+
+async function doTransfer() {
+  const bene_acc = document.getElementById('t-bene-account').value.trim();
+  const amount   = parseFloat(document.getElementById('t-amount').value);
+  const narration= document.getElementById('t-narration').value.trim();
+  const channel  = document.getElementById('t-channel').value;
+  const pin      = document.getElementById('t-pin').value.trim();
+  const rr       = document.getElementById('risk-result');
+  rr.style.display = 'none';
+
+  if (!bene_acc||!amount||!pin) { toast('Please fill all fields.'); return; }
+  if (amount <= 0)              { toast('Enter a valid amount.'); return; }
+
+  try {
+    const res = await post('/api/transfer', {
+      sender_account      : currentUser.account_number,
+      beneficiary_account : bene_acc,
+      amount, narration, channel, pin
+    });
+
+    // Show risk result
+    const band = res.risk_band;
+    rr.className      = `risk-result ${band}`;
+    rr.style.display  = '';
+
+    document.getElementById('risk-badge').innerHTML =
+      `<span class="risk-band-badge badge-${band}">${band}</span>`;
+    document.getElementById('risk-score-text').textContent =
+      `Risk Score: ${(res.risk_score * 100).toFixed(1)}%`;
+    document.getElementById('risk-message').textContent = res.message;
+    document.getElementById('risk-signals').innerHTML =
+      (res.top_signals||[]).map(s =>
+        `<span class="signal-tag">${s}</span>`
+      ).join('');
+    document.getElementById('risk-ndpa').textContent = res.ndpa_note || '';
+
+    if (res.status === 'completed') {
+      toast(`✅ ₦${amount.toLocaleString()} sent successfully!`);
+      currentUser.balance = res.new_balance;
+      document.getElementById('dash-balance').textContent = fmt(res.new_balance);
+    } else {
+      toast(`⚠️ Transfer held for compliance review.`, 5000);
+    }
+
+    loadDashboard();
+  } catch(e) { toast(`❌ ${e.message}`); }
+}
+
+// ── History ───────────────────────────────────────────────────────────────────
+
+async function loadHistory() {
+  if (!currentUser) return;
+  const txns = await get(`/api/transactions/${currentUser.account_number}?limit=50`);
+  const el = document.getElementById('history-list');
+  if (!txns.length) { el.innerHTML = '<div class="empty-state">No transactions yet.</div>'; return; }
+  el.innerHTML = txns.map(t => txnHtml(t)).join('');
+}
+
+async function saveProfile() {
+  const name  = document.getElementById('edit-name').value.trim();
+  const phone = document.getElementById('edit-phone').value.trim();
+  const state = document.getElementById('edit-state').value;
+  const pin   = document.getElementById('edit-pin').value.trim();
+  if (!pin) { toast('Enter your current PIN to save changes.'); return; }
+
+  try {
+    const res = await post('/api/profile/update', {
+      account_number : currentUser.account_number,
+      pin,
+      new_name  : name  || null,
+      new_phone : phone || null,
+      new_state : state || null,
+    });
+    currentUser.full_name = res.full_name;
+    currentUser.phone     = res.phone;
+    currentUser.state     = res.state;
+    document.getElementById('header-user').textContent = res.full_name;
+    loadProfile();
+    toast('✅ Profile updated successfully.');
+    document.getElementById('edit-pin').value = '';
+  } catch(e) { toast(`❌ ${e.message}`); }
+}
+
+async function changePin() {
+  const old_pin     = document.getElementById('old-pin').value.trim();
+  const new_pin     = document.getElementById('new-pin').value.trim();
+  const confirm_pin = document.getElementById('confirm-pin').value.trim();
+  if (!old_pin||!new_pin||!confirm_pin) { toast('Fill all PIN fields.'); return; }
+  if (new_pin !== confirm_pin)          { toast('New PINs do not match.'); return; }
+  if (new_pin.length !== 4)            { toast('PIN must be 4 digits.'); return; }
+
+  try {
+    await post('/api/profile/change-pin', {
+      account_number : currentUser.account_number,
+      old_pin,
+      new_pin,
+    });
+    toast('✅ PIN changed successfully.');
+    document.getElementById('old-pin').value     = '';
+    document.getElementById('new-pin').value     = '';
+    document.getElementById('confirm-pin').value = '';
+  } catch(e) { toast(`❌ ${e.message}`); }
+}
+
+function loadProfile() {
+  document.getElementById('prof-name').textContent    = currentUser.full_name;
+  document.getElementById('prof-phone').textContent   = currentUser.phone;
+  document.getElementById('prof-account').textContent = currentUser.account_number;
+  document.getElementById('prof-bvn').textContent     = currentUser.bvn;
+  document.getElementById('prof-state').textContent   = currentUser.state;
+  document.getElementById('edit-state').value         = currentUser.state;
+}
+
+function copyText(val, confirmId) {
+  navigator.clipboard.writeText(val).then(() => {
+    const el = document.getElementById(confirmId);
+    el.style.display = 'block';
+    setTimeout(() => el.style.display = 'none', 2000);
+  });
+}
+
+// ── Admin ─────────────────────────────────────────────────────────────────────
+
+async function loadAdmin() {
+  if (!currentUser?.is_admin) return;
+
+  const stats = await get(`/api/admin/stats?admin_phone=${currentUser.phone}`);
+  const grid  = document.getElementById('admin-stats-grid');
+  const dist  = stats.band_distribution || {};
+  grid.innerHTML = `
+    <div class="admin-stat"><div class="admin-stat-label">Total Transactions</div>
+      <div class="admin-stat-value">${stats.total_transactions}</div></div>
+    <div class="admin-stat"><div class="admin-stat-label">Registered Users</div>
+      <div class="admin-stat-value">${stats.total_users}</div></div>
+    <div class="admin-stat"><div class="admin-stat-label">Pending Review</div>
+      <div class="admin-stat-value" style="color:var(--orange)">${stats.pending_review}</div></div>
+    <div class="admin-stat"><div class="admin-stat-label">Total Volume</div>
+      <div class="admin-stat-value">${fmt(stats.total_volume_ngn)}</div></div>
+    <div class="admin-stat"><div class="admin-stat-label">Avg Risk Score</div>
+      <div class="admin-stat-value">${(stats.avg_risk_score*100).toFixed(1)}%</div></div>
+    <div class="admin-stat"><div class="admin-stat-label">High/Critical</div>
+      <div class="admin-stat-value" style="color:var(--red)">${stats.high_risk_count}</div></div>
+    <div class="admin-stat"><div class="admin-stat-label">LOW</div>
+      <div class="admin-stat-value" style="color:var(--green)">${dist.LOW||0}</div></div>
+    <div class="admin-stat"><div class="admin-stat-label">MEDIUM</div>
+      <div class="admin-stat-value" style="color:var(--yellow)">${dist.MEDIUM||0}</div></div>
+    <div class="admin-stat"><div class="admin-stat-label">HIGH</div>
+      <div class="admin-stat-value" style="color:var(--orange)">${dist.HIGH||0}</div></div>
+    <div class="admin-stat"><div class="admin-stat-label">CRITICAL</div>
+      <div class="admin-stat-value" style="color:var(--red)">${dist.CRITICAL||0}</div></div>
+  `;
+
+  if (stats.pending_review > 0) {
+    const badge = document.getElementById('queue-badge');
+    badge.style.display = '';
+    badge.textContent   = stats.pending_review;
+  }
+
+  const txns = await get(`/api/admin/transactions?admin_phone=${currentUser.phone}&limit=100`);
+  const body  = document.getElementById('admin-txn-body');
+  body.innerHTML = txns.map(t => {
+    const pct   = (t.risk_score * 100).toFixed(0);
+    const color = bandColor(t.risk_band);
+    return `<tr>
+      <td style="font-family:monospace;font-size:12px">${t.transaction_ref}</td>
+      <td>${t.sender_name||t.sender_account}</td>
+      <td>${t.beneficiary_name||t.beneficiary_account}</td>
+      <td style="font-weight:600">${fmt(t.amount)}</td>
+      <td>
+        <div class="score-bar">
+          <div class="score-track">
+            <div class="score-fill" style="width:${pct}%;background:${color}"></div>
+          </div>
+          <span style="font-size:12px;color:${color};font-weight:600">${pct}%</span>
+        </div>
+      </td>
+      <td><span class="risk-band-badge badge-${t.risk_band}">${t.risk_band}</span></td>
+      <td><span style="color:${statusColor(t.status)}">${t.status}</span></td>
+      <td style="font-size:12px;color:var(--text2)">${fmtDate(t.created_at)}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── Queue ─────────────────────────────────────────────────────────────────────
+
+async function loadQueue() {
+  if (!currentUser?.is_admin) return;
+  const items = await get(`/api/admin/queue?admin_phone=${currentUser.phone}`);
+  const el    = document.getElementById('queue-list');
+
+  if (!items.length) {
+    el.innerHTML = '<div class="empty-state">✅ No transactions pending review.</div>';
+    return;
+  }
+
+  el.innerHTML = items.map(t => {
+    const signals = JSON.parse(t.top_signals||'[]');
+    return `
+      <div class="queue-item">
+        <div class="queue-header">
+          <div>
+            <span class="risk-band-badge badge-${t.risk_band}">${t.risk_band}</span>
+            <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:700;margin-top:8px">
+              ${fmt(t.amount)}
+            </div>
+            <div style="font-size:13px;color:var(--text2);margin-top:4px">
+              From: <b>${t.sender_name||t.sender_account}</b>
+              → To: <b>${t.beneficiary_name||t.beneficiary_account}</b>
+            </div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-family:monospace;font-size:12px;color:var(--muted)">${t.transaction_ref}</div>
+            <div style="font-size:12px;color:var(--text2);margin-top:4px">${fmtDate(t.created_at)}</div>
+            <div style="font-size:22px;font-weight:800;font-family:'Syne',sans-serif;
+                        color:${bandColor(t.risk_band)};margin-top:6px">
+              ${(t.risk_score*100).toFixed(1)}%
+            </div>
+          </div>
+        </div>
+
+        <div style="font-size:12px;color:var(--text2);font-style:italic">${t.ndpa_note}</div>
+
+        ${signals.length ? `
+          <div class="signal-tags">
+            ${signals.map(s => `<span class="signal-tag">⚠ ${s}</span>`).join('')}
+          </div>` : ''}
+
+        <div class="queue-actions">
+          <button class="btn-approve"
+            onclick="reviewTxn('${t.transaction_ref}','APPROVE')">
+            ✓ Approve
+          </button>
+          <button class="btn-reject"
+            onclick="reviewTxn('${t.transaction_ref}','REJECT')">
+            ✗ Reject
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function reviewTxn(ref, action) {
+  if (!confirm(`${action} transaction ${ref}?`)) return;
+  try {
+    await post('/api/admin/review', {
+      transaction_ref : ref,
+      action,
+      note            : `${action}D by admin via compliance queue.`,
+      admin_phone     : currentUser.phone,
+    });
+    toast(`Transaction ${action}D successfully.`);
+    loadQueue();
+    loadAdmin();
+  } catch(e) { toast(`❌ ${e.message}`); }
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+function txnHtml(t) {
+  const isDebit  = t.sender_account === currentUser?.account_number;
+  const other    = isDebit ? (t.beneficiary_name||t.beneficiary_account)
+                           : (t.sender_name||t.sender_account);
+  const sign     = isDebit ? '-' : '+';
+  const cls      = isDebit ? 'debit' : 'credit';
+  const icon     = isDebit ? '↑' : '↓';
+  const band     = t.risk_band || 'LOW';
+
+  const statusLabel = {
+    completed      : 'Completed',
+    pending_review : 'Pending',
+    rejected       : 'Declined'
+  }[t.status] || t.status;
+
+  const statusCol = {
+    completed      : 'var(--text2)',
+    pending_review : 'var(--orange)',
+    rejected       : 'var(--red)'
+  }[t.status] || 'var(--text2)';
+
+  return `
+    <div class="txn-item">
+      <div class="txn-left">
+        <div class="txn-icon ${cls}">${icon}</div>
+        <div>
+          <div class="txn-name">${other}</div>
+          <div class="txn-date">${fmtDate(t.created_at)} · ${t.channel||'app'}</div>
+        </div>
+      </div>
+      <div class="txn-right">
+        <div class="txn-amount ${cls}">${sign}${fmt(t.amount)}</div>
+          <div class="txn-status" style="color:${statusCol};font-size:11px">
+            ${statusLabel}
+          </div>
+      </div>
+    </div>`;
+}
+
+function fmt(n) {
+  return '₦' + parseFloat(n||0).toLocaleString('en-NG', {minimumFractionDigits:2});
+}
+
+function fmtDate(s) {
+  if (!s) return '—';
+  return new Date(s).toLocaleString('en-NG', {
+    day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'
+  });
+}
+
+function bandColor(band) {
+  return {LOW:'#00c853',MEDIUM:'#ffd60a',HIGH:'#ff9500',CRITICAL:'#ff4444'}[band]||'#888';
+}
+
+function statusColor(s) {
+  return {completed:'#00c853',pending_review:'#ff9500',rejected:'#ff4444'}[s]||'#888';
+}
+
+function showErr(el, msg) { el.textContent = msg; el.style.display = ''; }
+
+function toast(msg, duration=3000) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), duration);
+}
+
+async function get(url) {
+  const res = await fetch(API + url);
+  if (!res.ok) { const e = await res.json(); throw new Error(e.detail||'Request failed'); }
+  return res.json();
+}
+
+async function post(url, body) {
+  const res = await fetch(API + url, {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(body)
+  });
+  if (!res.ok) { const e = await res.json(); throw new Error(e.detail||'Request failed'); }
+  return res.json();
+}
+function copyAccount() {
+  navigator.clipboard.writeText(currentUser.account_number).then(() => {
+    const confirm = document.getElementById('copy-confirm');
+    confirm.style.display = 'inline';
+    setTimeout(() => confirm.style.display = 'none', 2000);
+  });
+}
+</script>
+</body>
+</html>

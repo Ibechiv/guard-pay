@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: guardpay
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: FRAUD_API_URL
+        value: https://your-fraud-api.onrender.com
