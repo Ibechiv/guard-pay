@@ -315,9 +315,92 @@
     transform: translateY(100px); opacity: 0;
     transition: all 0.3s; z-index: 1000; max-width: 320px;
   }
-  .toast.show { transform: translateY(0); opacity: 1; }
-  .tab-content { display: none; }
-  .tab-content.active { display: block; }
+   .toast.show { transform: translateY(0); opacity: 1; }
+   .tab-content { display: none; }
+   .tab-content.active { display: block; }
+
+   /* ── Mobile Responsive ── */
+   @media (max-width: 768px) {
+     /* Auth Screen */
+     #auth-screen { padding: 16px; }
+     .auth-box { padding: 24px; max-width: 100%; }
+     .logo h1 { font-size: 20px; }
+     .form-group input, .form-group select { padding: 12px 12px; font-size: 16px; }
+     .btn-primary { padding: 12px 16px; font-size: 14px; }
+
+     /* Dashboard */
+     #app-container { padding: 12px; }
+     .dashboard { gap: 12px; }
+     .main-content { grid-template-columns: 1fr; }
+     .sidebar { display: none; }
+
+     /* Nav */
+     .navbar { padding: 12px 16px; }
+     .nav-logo h2 { font-size: 18px; }
+
+     /* Cards */
+     .card-balance { padding: 20px 16px; }
+     .balance-value { font-size: 28px; }
+     .balance-label { font-size: 12px; }
+
+     /* Admin Stats */
+     .admin-stats { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+     .admin-stat { padding: 16px; }
+     .admin-stat-value { font-size: 20px; }
+
+     /* Transactions */
+     .txn-item { padding: 12px 14px; flex-wrap: wrap; }
+     .txn-left { flex: 1; }
+     .txn-right { width: 100%; text-align: left; margin-top: 8px; }
+     .txn-name { font-size: 13px; }
+     .txn-amount { font-size: 14px; }
+
+     /* Buttons */
+     .btn-primary, .btn-secondary { padding: 10px 14px; font-size: 13px; }
+     .btn-approve, .btn-reject { padding: 8px 12px; font-size: 12px; }
+
+     /* Forms */
+     .form-group label { font-size: 11px; }
+
+     /* Queue */
+     .queue-header { flex-direction: column; gap: 10px; }
+     .queue-actions { width: 100%; flex-direction: column; }
+     .queue-actions button { width: 100%; }
+
+     /* Toast */
+     .toast { bottom: 12px; right: 12px; left: 12px; max-width: none; }
+
+     /* Table */
+     .table-wrap { font-size: 12px; }
+     table { font-size: 11px; }
+     thead th { padding: 8px 12px; }
+     tbody td { padding: 8px 12px; }
+   }
+
+   @media (max-width: 480px) {
+     /* Extra small screens */
+     #auth-screen { padding: 12px; }
+     .auth-box { padding: 20px; border-radius: 16px; }
+     .logo { margin-bottom: 24px; }
+     .logo-icon { width: 40px; height: 40px; font-size: 20px; }
+     .logo h1 { font-size: 18px; }
+
+     .admin-stats { grid-template-columns: 1fr; }
+     .admin-stat-value { font-size: 18px; }
+
+     /* Navbar */
+     .navbar-actions { gap: 8px; flex-wrap: wrap; }
+     .btn-nav { padding: 8px 10px; font-size: 12px; }
+
+     /* Headings */
+     .section-title { font-size: 14px; }
+
+     /* Transfer Form */
+     .transfer-form { padding: 16px; }
+
+     /* Risk Result */
+     .risk-result { padding: 16px; }
+   }
 </style>
 </head>
 <body>
