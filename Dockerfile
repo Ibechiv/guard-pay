@@ -15,9 +15,5 @@ RUN pip install --upgrade pip && \
 COPY main.py database.py fraud_client.py ./
 COPY static/ ./static/
 
-# Expose port
+# Expose port (Railway will set PORT env var)
 EXPOSE 8000
-
-# Start application
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
-
