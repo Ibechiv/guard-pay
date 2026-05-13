@@ -49,6 +49,4 @@ wheels/
 Thumbs.db
 .DS_Store
 
-# Render
-render.yaml
 
