@@ -261,7 +261,10 @@
     text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
   .admin-stat-value { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 700; }
 
-  .table-wrap { overflow-x: auto; max-width: 100%; }
+  /* Transactions table wrapper: center on desktop with same max width as balance card
+     and allow horizontal scroll when needed. On small screens media queries override
+     to full-width. */
+  .table-wrap { overflow-x: auto; max-width: 800px; margin: 0 auto; }
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
   thead th {
     text-align: left; padding: 12px 16px;
