@@ -245,19 +245,23 @@
   .dot-CRITICAL { background: var(--red); }
 
   /* ── Admin ── */
+  /* keep admin dashboard content aligned with main balance card */
   .admin-stats {
     display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
     gap: 16px; margin-bottom: 28px;
+    max-width: 800px; margin: 0 auto;
   }
   .admin-stat {
     background: var(--card); border: 1px solid var(--border);
     border-radius: var(--radius); padding: 20px;
+    transition: border-color 0.15s, box-shadow 0.15s;
   }
+  .admin-stat:hover { border-color: var(--green); box-shadow: 0 10px 30px rgba(0,200,83,0.04); }
   .admin-stat-label { font-size: 11px; color: var(--text2);
     text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
   .admin-stat-value { font-family: 'Syne', sans-serif; font-size: 26px; font-weight: 700; }
 
-  .table-wrap { overflow-x: auto; }
+  .table-wrap { overflow-x: auto; max-width: 100%; }
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
   thead th {
     text-align: left; padding: 12px 16px;
@@ -280,6 +284,7 @@
   .queue-item {
     background: var(--card); border: 1px solid var(--border);
     border-radius: var(--radius); padding: 24px; margin-bottom: 16px;
+    max-width: 800px; margin: 0 auto;
   }
   .queue-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
   .queue-actions { display: flex; gap: 10px; margin-top: 16px; }
@@ -330,13 +335,14 @@
      .btn-primary { padding: 12px 16px; font-size: 14px; }
 
      /* Dashboard */
-     #app-container { padding: 12px; }
+     #app-container { padding: 0; }
+     .app-content { padding: 12px; max-width: 100%; }
      .dashboard { gap: 12px; }
      .main-content { grid-template-columns: 1fr; }
      .sidebar { display: none; }
-     .balance-card { max-width: 100%; padding: 24px; }
+     .balance-card { max-width: 100% !important; padding: 24px 16px; width: 100%; }
      .balance-amount { font-size: 32px; }
-     .grid-2 { grid-template-columns: 1fr 1fr; max-width: 100%; }
+     .grid-2 { grid-template-columns: 1fr 1fr; max-width: 100% !important; width: 100%; }
 
      /* Nav */
      .navbar { padding: 12px 16px; }
@@ -348,7 +354,7 @@
      .balance-label { font-size: 12px; }
 
      /* Admin Stats */
-     .admin-stats { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .admin-stats { grid-template-columns: repeat(2, 1fr); gap: 12px; max-width: 100%; margin: 0; }
      .admin-stat { padding: 16px; }
      .admin-stat-value { font-size: 20px; }
 
@@ -375,7 +381,7 @@
      .toast { bottom: 12px; right: 12px; left: 12px; max-width: none; }
 
      /* Table */
-     .table-wrap { font-size: 12px; }
+      .table-wrap { font-size: 12px; max-width: 100%; }
      table { font-size: 11px; }
      thead th { padding: 8px 12px; }
      tbody td { padding: 8px 12px; }
@@ -389,13 +395,18 @@
      .logo-icon { width: 40px; height: 40px; font-size: 20px; }
      .logo h1 { font-size: 18px; }
 
-     /* Balance card */
-     .balance-card { padding: 20px; }
-     .balance-amount { font-size: 26px; letter-spacing: -0.5px; }
-     .balance-label { font-size: 10px; }
+      /* Full width containers */
+        .app-content { padding: 10px; max-width: 100%; }
 
-     .admin-stats { grid-template-columns: 1fr; }
-     .admin-stat-value { font-size: 18px; }
+        /* Balance card */
+        .balance-card { padding: 18px 14px; max-width: 100% !important; width: 100%; }
+        .balance-amount { font-size: 24px; letter-spacing: -0.5px; }
+        .balance-label { font-size: 10px; }
+
+        .grid-2 { max-width: 100% !important; width: 100%; }
+
+        .admin-stats { grid-template-columns: 1fr; max-width: 100% !important; width: 100%; margin: 0; }
+        .admin-stat-value { font-size: 18px; }
 
      /* Navbar */
      .navbar-actions { gap: 8px; flex-wrap: wrap; }
@@ -490,6 +501,7 @@
     </button>
   </nav>
 
+    <div class="app-content">
     <!-- Dashboard -->
     <div id="tab-dashboard" class="tab-content active">
       <div class="balance-card">
@@ -619,8 +631,7 @@
       </p>
       <div id="queue-list"></div>
     </div>
-</div>
-
+    </div> <!-- /.app-content -->
 
 <div class="toast" id="toast"></div>
 
