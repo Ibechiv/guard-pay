@@ -233,7 +233,7 @@ def transfer(req: TransferRequest):
         channel             = req.channel,
         sender_bank         = "GuardPay",
         state               = sender["state"],
-        sim_age_days        = 365,
+        sim_age_days        = 1,
         velocity_1h         = v1h,
         velocity_6h         = v6h,
         velocity_24h        = v24h,
