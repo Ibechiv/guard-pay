@@ -468,6 +468,10 @@ def favicon():
     # Return a minimal favicon to suppress 404 logs
     return {"status": "ok"}
 
+@app.get("/api/health")
+def health():
+    return {"status": "ok"}
+
 @app.get("/", response_class=HTMLResponse)
 def serve_app():
     html_path = os.path.join(STATIC_DIR, "app.html")
