@@ -579,35 +579,63 @@
       </div>
     </div>
 
-    <!-- Change Name / State / Phone -->
-  <div id="tab-profile" class="tab-content">
-      <div class="transfer-card">
-        <h3>Edit Profile</h3>
-        <div class="form-group">
-          <label>Full Name</label>
-          <input type="text" id="edit-name" placeholder="Leave blank to keep current"/>
-        </div>
-        <div class="form-group">
-          <label>Phone Number</label>
-          <input type="tel" id="edit-phone" placeholder="Leave blank to keep current"/>
-        </div>
-        <div class="form-group">
-          <label>State</label>
-          <select id="edit-state">
-            <option>Lagos</option><option>Abuja</option><option>Kano</option>
-            <option>Rivers</option><option>Oyo</option><option>Kaduna</option>
-            <option>Anambra</option><option>Delta</option><option>Enugu</option>
-            <option>Ogun</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Current PIN (required to save)</label>
-          <input type="password" id="edit-pin" maxlength="4" placeholder="••••"/>
-        </div>
-        <button class="btn-primary" onclick="saveProfile()">Save Changes</button>
-      </div>
-    </div>
-  
+    <!-- Profile -->
+   <div id="tab-profile" class="tab-content">
+       <!-- Current Profile Info -->
+       <div class="transfer-card" style="margin-bottom: 24px;">
+         <h3>Profile Information</h3>
+         <div style="display: grid; gap: 16px;">
+           <div>
+             <div style="font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Full Name</div>
+             <div id="prof-name" style="font-size: 16px; font-weight: 500;">—</div>
+           </div>
+           <div>
+             <div style="font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Phone Number</div>
+             <div id="prof-phone" style="font-size: 16px; font-weight: 500;">—</div>
+           </div>
+           <div>
+             <div style="font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">Account Number</div>
+             <div id="prof-account" style="font-size: 16px; font-weight: 500; font-family: monospace;">—</div>
+           </div>
+           <div>
+             <div style="font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">BVN</div>
+             <div id="prof-bvn" style="font-size: 16px; font-weight: 500; font-family: monospace;">—</div>
+           </div>
+           <div>
+             <div style="font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">State</div>
+             <div id="prof-state" style="font-size: 16px; font-weight: 500;">—</div>
+           </div>
+         </div>
+       </div>
+
+       <!-- Edit Profile Form -->
+       <div class="transfer-card">
+         <h3>Edit Profile</h3>
+         <div class="form-group">
+           <label>Full Name</label>
+           <input type="text" id="edit-name" placeholder="Leave blank to keep current"/>
+         </div>
+         <div class="form-group">
+           <label>Phone Number</label>
+           <input type="tel" id="edit-phone" placeholder="Leave blank to keep current"/>
+         </div>
+         <div class="form-group">
+           <label>State</label>
+           <select id="edit-state">
+             <option>Lagos</option><option>Abuja</option><option>Kano</option>
+             <option>Rivers</option><option>Oyo</option><option>Kaduna</option>
+             <option>Anambra</option><option>Delta</option><option>Enugu</option>
+             <option>Ogun</option>
+           </select>
+         </div>
+         <div class="form-group">
+           <label>Current PIN (required to save)</label>
+           <input type="password" id="edit-pin" maxlength="4" placeholder="••••"/>
+         </div>
+         <button class="btn-primary" onclick="saveProfile()">Save Changes</button>
+       </div>
+     </div>
+
     <!-- Admin -->
     <div id="tab-admin" class="tab-content">
       <div class="admin-stats" id="admin-stats-grid"></div>
@@ -868,13 +896,17 @@ async function changePin() {
 }
 
 function loadProfile() {
-  document.getElementById('prof-name').textContent    = currentUser.full_name;
-  document.getElementById('prof-phone').textContent   = currentUser.phone;
-  document.getElementById('prof-account').textContent = currentUser.account_number;
-  document.getElementById('prof-bvn').textContent     = currentUser.bvn;
-  document.getElementById('prof-state').textContent   = currentUser.state;
-  document.getElementById('edit-state').value         = currentUser.state;
-}
+   document.getElementById('prof-name').textContent    = currentUser.full_name;
+   document.getElementById('prof-phone').textContent   = currentUser.phone;
+   document.getElementById('prof-account').textContent = currentUser.account_number;
+   document.getElementById('prof-bvn').textContent     = currentUser.bvn;
+   document.getElementById('prof-state').textContent   = currentUser.state;
+   document.getElementById('edit-state').value         = currentUser.state;
+   // Clear edit form fields
+   document.getElementById('edit-name').value = '';
+   document.getElementById('edit-phone').value = '';
+   document.getElementById('edit-pin').value = '';
+ }
 
 function copyText(val, confirmId) {
   navigator.clipboard.writeText(val).then(() => {
